@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/services",       "destination": "/api/services.js"  },
+    { "source": "/api/services/:id",   "destination": "/api/services.js"  },
+    { "source": "/api/barbers",        "destination": "/api/barbers.js"   },
+    { "source": "/api/barbers/:id",    "destination": "/api/barbers.js"   },
+    { "source": "/api/bookings",       "destination": "/api/bookings.js"  }
+  ]
+}

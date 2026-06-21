@@ -1,0 +1,8 @@
+[
+  { "id": "svc-001", "name": "Classic Gentleman's Cut", "category": "hair",  "price": 45,  "duration": "45 mins", "desc": "Precision scissor and clipper cut tailored to your face shape, finished with a hot towel and styling product." },
+  { "id": "svc-002", "name": "Signature Fade",           "category": "hair",  "price": 55,  "duration": "50 mins", "desc": "Seamless skin-to-length fade crafted by our master barbers. Includes neck shave and line-up finish." },
+  { "id": "svc-003", "name": "Royal Beard Trim",         "category": "beard", "price": 35,  "duration": "30 mins", "desc": "Expert beard sculpting, edge detailing, and hot-towel treatment to define your beard with precision." },
+  { "id": "svc-004", "name": "Luxury Hot Shave",         "category": "beard", "price": 65,  "duration": "45 mins", "desc": "Traditional straight-razor shave with hot towels, pre-shave oil, and post-shave balm." },
+  { "id": "svc-005", "name": "Gold Scalp Treatment",     "category": "spa",   "price": 80,  "duration": "60 mins", "desc": "Deep conditioning scalp massage with premium argan oil and vitamin-infused serum." },
+  { "id": "svc-006", "name": "Prestige Full Package",    "category": "spa",   "price": 150, "duration": "120 mins","desc": "The complete LuxeCut experience: haircut, beard trim, hot shave, scalp treatment, and facial." }
+]

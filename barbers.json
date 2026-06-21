@@ -1,0 +1,5 @@
+[
+  { "id": "brb-001", "name": "Marcus Reid",    "specialty": "Master Barber & Fade Specialist",  "rating": 4.9, "reviews": 248, "image": "https://ui-avatars.com/api/?name=MR&background=1e1e24&color=d4af37&size=200&bold=true", "available": true,  "haircutCount": 0 },
+  { "id": "brb-002", "name": "Sophia Rossi",   "specialty": "Senior Stylist & Color Expert",     "rating": 4.8, "reviews": 192, "image": "https://ui-avatars.com/api/?name=SR&background=1e1e24&color=d4af37&size=200&bold=true", "available": true,  "haircutCount": 0 },
+  { "id": "brb-003", "name": "Kai Nakamura",   "specialty": "Beard & Grooming Artisan",          "rating": 4.7, "reviews": 156, "image": "https://ui-avatars.com/api/?name=KN&background=1e1e24&color=d4af37&size=200&bold=true", "available": false, "haircutCount": 0 }
+]

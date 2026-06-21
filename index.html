@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuxeCut | Premium Barber Shop &amp; Salon Booking</title>
+  <meta name="description" content="Book your premium haircut, grooming, and spa sessions at LuxeCut.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header id="main-header">
+  <div class="container">
+    <nav>
+      <a href="#" class="logo">LUXE<span>CUT</span></a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#" class="active">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#barbers">Stylists</a></li>
+        <li><a href="#location">Hours &amp; Location</a></li>
+        <li><a href="#booking" class="nav-book-btn">Book Appointment</a></li>
+      </ul>
+      <button class="mobile-toggle" aria-label="Toggle menu" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <span class="hero-subtitle">Est. 2018 &bull; Premium Grooming</span>
+      <h1>Crafting Your <span>Signature</span> Look</h1>
+      <p class="hero-desc">Experience the pinnacle of barbering and grooming. Luxury treatments, master stylists, and a sophisticated atmosphere tailored to the modern gentleman.</p>
+      <div class="hero-buttons">
+        <a href="#booking" class="btn btn-primary"><i class="fa-solid fa-calendar-check"></i> Book Session</a>
+        <a href="#services" class="btn btn-secondary">Explore Services</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SERVICES ══ -->
+<section id="services" class="section-padding">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our Services</h2>
+      <p>Select from our menu of premium cuts, grooming treatments, and luxury relaxation therapies.</p>
+    </div>
+    <div class="services-filters">
+      <button class="filter-btn active" data-filter="all">All Treatments</button>
+      <button class="filter-btn" data-filter="hair">Haircuts &amp; Styling</button>
+      <button class="filter-btn" data-filter="beard">Beard &amp; Shave</button>
+      <button class="filter-btn" data-filter="spa">Spa &amp; Grooming</button>
+    </div>
+    <div class="services-grid" id="catalog-services-container">
+      <div class="loading-placeholder"><i class="fa-solid fa-spinner fa-spin"></i> Loading services...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BARBERS ══ -->
+<section id="barbers" class="section-padding" style="background-color:#0c0c0f">
+  <div class="container">
+    <div class="section-header">
+      <h2>Master Artisans</h2>
+      <p>Our team of highly-skilled barbers and stylists are dedicated to their craft, ensuring you leave looking your absolute best.</p>
+    </div>
+    <div class="barbers-grid" id="catalog-barbers-container">
+      <div class="loading-placeholder"><i class="fa-solid fa-spinner fa-spin"></i> Loading stylists...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BOOKING WIZARD ══ -->
+<section id="booking" class="section-padding booking-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Reserve Your Spot</h2>
+      <p>Schedule your next premium experience in just a few simple clicks.</p>
+    </div>
+
+    <div class="booking-wizard">
+      <!-- Progress Bar -->
+      <div class="wizard-header">
+        <div class="wizard-progress">
+          <div class="wizard-progress-bar" id="wizard-progress-bar"></div>
+          <div class="progress-step active" data-step="1"><div class="step-node">1</div><span class="step-label">Services</span></div>
+          <div class="progress-step" data-step="2"><div class="step-node">2</div><span class="step-label">Stylist</span></div>
+          <div class="progress-step" data-step="3"><div class="step-node">3</div><span class="step-label">Date &amp; Time</span></div>
+          <div class="progress-step" data-step="4"><div class="step-node">4</div><span class="step-label">Checkout</span></div>
+          <div class="progress-step" data-step="5"><div class="step-node">5</div><span class="step-label">Confirm</span></div>
+        </div>
+      </div>
+
+      <!-- Step Panels -->
+      <div class="wizard-content">
+
+        <!-- Step 1: Services -->
+        <div class="wizard-step active" id="step-panel-1">
+          <h3 class="wizard-step-title">Select One or More Services</h3>
+          <div class="wizard-services-grid" id="wizard-services-container"></div>
+        </div>
+
+        <!-- Step 2: Stylist -->
+        <div class="wizard-step" id="step-panel-2">
+          <h3 class="wizard-step-title">Choose Your Stylist</h3>
+          <div class="wizard-barbers-grid" id="wizard-barbers-container"></div>
+        </div>
+
+        <!-- Step 3: Date & Time -->
+        <div class="wizard-step" id="step-panel-3">
+          <h3 class="wizard-step-title">Choose Date &amp; Time</h3>
+          <div class="datetime-container">
+            <div class="calendar-widget">
+              <div class="calendar-header">
+                <button class="calendar-nav-btn" onclick="changeMonth(-1)" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="calendar-title" id="calendar-month-year"></span>
+                <button class="calendar-nav-btn" onclick="changeMonth(1)" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="calendar-weekdays">
+                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+              </div>
+              <div class="calendar-days" id="calendar-days-grid"></div>
+            </div>
+            <div class="time-widget">
+              <span class="time-slots-section-title">Available Slots</span>
+              <div class="time-slots-grid" id="time-slots-container">
+                <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.9rem">Select a date first.</p>
+              </div>
+              <p class="time-slots-section-title" id="selected-datetime-preview" style="margin-top:auto;color:var(--primary)">No slot selected</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Checkout -->
+        <div class="wizard-step" id="step-panel-4">
+          <h3 class="wizard-step-title">Booking Details &amp; Payment</h3>
+          <div class="checkout-container">
+            <div class="checkout-form">
+              <div class="form-group-row">
+                <div class="form-group">
+                  <label for="client-name">Full Name *</label>
+                  <input type="text" id="client-name" placeholder="John Doe" autocomplete="name">
+                </div>
+                <div class="form-group">
+                  <label for="client-email">Email Address *</label>
+                  <input type="email" id="client-email" placeholder="john@example.com" autocomplete="email">
+                </div>
+              </div>
+              <div class="form-group-row">
+                <div class="form-group">
+                  <label for="client-phone">Phone Number *</label>
+                  <input type="tel" id="client-phone" placeholder="(555) 000-0000" autocomplete="tel">
+                </div>
+                <div class="form-group">
+                  <label for="client-notes">Special Instructions (Optional)</label>
+                  <input type="text" id="client-notes" placeholder="e.g. skin sensitivity, styling preferences">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Choose Payment Method</label>
+                <div class="payment-methods-grid">
+                  <div class="payment-card selected" data-method="card">
+                    <i class="fa-solid fa-credit-card"></i><span>Credit Card</span>
+                  </div>
+                  <div class="payment-card" data-method="digital">
+                    <i class="fa-brands fa-apple-pay"></i><span>Apple / Google Pay</span>
+                  </div>
+                  <div class="payment-card" data-method="salon">
+                    <i class="fa-solid fa-wallet"></i><span>Pay at Salon</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-details-fields" id="card-payment-details">
+                <div class="form-group">
+                  <label for="card-num">Card Number</label>
+                  <input type="text" id="card-num" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number">
+                </div>
+                <div class="form-group-row">
+                  <div class="form-group">
+                    <label for="card-expiry">Expiry Date</label>
+                    <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp">
+                  </div>
+                  <div class="form-group">
+                    <label for="card-cvc">CVC</label>
+                    <input type="password" id="card-cvc" placeholder="***" maxlength="4" autocomplete="cc-csc">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary-box">
+              <h4 class="summary-title">Booking Summary</h4>
+              <div class="summary-services-list" id="summary-services-container"></div>
+              <div class="summary-row"><span class="label">Stylist:</span><span class="val" id="summary-stylist-name">—</span></div>
+              <div class="summary-row"><span class="label">Schedule:</span><span class="val" id="summary-schedule-time">—</span></div>
+              <div class="summary-row" style="margin-top:15px"><span class="label">Subtotal:</span><span class="val" id="summary-subtotal">$0.00</span></div>
+              <div class="summary-row"><span class="label">Tax (8%):</span><span class="val" id="summary-tax">$0.00</span></div>
+              <div class="summary-row accent total"><span class="label">Total:</span><span class="val" id="summary-total">$0.00</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Confirmation Receipt -->
+        <div class="wizard-step" id="step-panel-5">
+          <div class="receipt-wrapper">
+            <div class="receipt-ticket">
+              <div class="receipt-top">
+                <div class="receipt-success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <h3>Booking Confirmed!</h3>
+                <p class="receipt-id" id="receipt-booking-id">ID: #LXC-0000-A0</p>
+              </div>
+              <div class="receipt-body">
+                <div class="receipt-info-grid">
+                  <div class="receipt-info-item">
+                    <span class="receipt-info-label">Client</span>
+                    <span class="receipt-info-value" id="receipt-client-name">—</span>
+                  </div>
+                  <div class="receipt-info-item">
+                    <span class="receipt-info-label">Stylist</span>
+                    <span class="receipt-info-value" id="receipt-stylist-name">—</span>
+                  </div>
+                  <div class="receipt-info-item">
+                    <span class="receipt-info-label">Date</span>
+                    <span class="receipt-info-value" id="receipt-date">—</span>
+                  </div>
+                  <div class="receipt-info-item">
+                    <span class="receipt-info-label">Time</span>
+                    <span class="receipt-info-value" id="receipt-time">—</span>
+                  </div>
+                </div>
+                <div class="receipt-services" id="receipt-services-list"></div>
+                <div class="receipt-qr-section">
+                  <div class="receipt-qr">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="100" height="100" fill="#fff"/>
+                      <rect x="5" y="5" width="25" height="25" fill="#000"/><rect x="9" y="9" width="17" height="17" fill="#fff"/><rect x="13" y="13" width="9" height="9" fill="#000"/>
+                      <rect x="70" y="5" width="25" height="25" fill="#000"/><rect x="74" y="9" width="17" height="17" fill="#fff"/><rect x="78" y="13" width="9" height="9" fill="#000"/>
+                      <rect x="5" y="70" width="25" height="25" fill="#000"/><rect x="9" y="74" width="17" height="17" fill="#fff"/><rect x="13" y="78" width="9" height="9" fill="#000"/>
+                      <rect x="75" y="75" width="10" height="10" fill="#000"/><rect x="78" y="78" width="4" height="4" fill="#fff"/>
+                      <rect x="35" y="5" width="5" height="10" fill="#000"/><rect x="45" y="15" width="10" height="5" fill="#000"/>
+                      <rect x="60" y="5" width="5" height="25" fill="#000"/><rect x="35" y="30" width="15" height="5" fill="#000"/>
+                      <rect x="55" y="30" width="10" height="10" fill="#000"/><rect x="5" y="35" width="10" height="5" fill="#000"/>
+                      <rect x="20" y="45" width="15" height="15" fill="#000"/><rect x="5" y="55" width="10" height="10" fill="#000"/>
+                      <rect x="40" y="45" width="5" height="15" fill="#000"/><rect x="50" y="55" width="15" height="10" fill="#000"/>
+                      <rect x="70" y="35" width="15" height="5" fill="#000"/><rect x="75" y="45" width="5" height="20" fill="#000"/>
+                      <rect x="85" y="45" width="10" height="10" fill="#000"/><rect x="35" y="70" width="10" height="5" fill="#000"/>
+                      <rect x="35" y="80" width="5" height="15" fill="#000"/><rect x="45" y="85" width="20" height="5" fill="#000"/>
+                    </svg>
+                  </div>
+                  <p class="receipt-qr-note">Scan at salon counter upon arrival</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.wizard-content -->
+
+      <!-- Wizard Nav Footer -->
+      <div class="wizard-footer" id="wizard-navigation-footer">
+        <button class="btn btn-secondary btn-disabled" id="prev-step-btn" onclick="navigateWizard(-1)" disabled>
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <button class="btn btn-primary btn-disabled" id="next-step-btn" onclick="navigateWizard(1)">
+          Next <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div><!-- /.booking-wizard -->
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="section-padding" style="background-color:#0c0c0f">
+  <div class="container">
+    <div class="section-header">
+      <h2>Salon Reviews</h2>
+      <p>Don't just take our word for it. Here is what our esteemed guests have to say.</p>
+    </div>
+    <div class="testimonials-slider">
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"The service here is impeccable. Marcus pays extraordinary attention to detail. The gold accents, the coffee, the overall vibe — it's pure luxury."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JD</div>
+          <div class="testimonial-meta">
+            <h4>James Devere</h4><p>Premium Client</p>
+            <div class="testimonial-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Sophia Rossi is a hair genius. She understood exactly what styling would suit my face shape and delivered a flawless cut. Highly recommend."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AL</div>
+          <div class="testimonial-meta">
+            <h4>Alexander Lindt</h4><p>Loyal Guest</p>
+            <div class="testimonial-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"The online slot booking is super smooth. I scheduled my beard trim and facial, chose Kai, and paid upfront. In and out in 45 minutes of pure comfort."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MW</div>
+          <div class="testimonial-meta">
+            <h4>Michael Wright</h4><p>Tech Professional</p>
+            <div class="testimonial-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LOCATION ══ -->
+<section id="location" class="section-padding">
+  <div class="container">
+    <div class="section-header">
+      <h2>Location &amp; Hours</h2>
+      <p>Find us in the heart of the city or reach out for special booking inquiries.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info-panel">
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+          <div class="contact-detail-text"><h3>Address</h3><p>410 Prestige Boulevard, Suite 100<br>Downtown Metropolis, NY 10001</p></div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fa-solid fa-phone-volume"></i></div>
+          <div class="contact-detail-text"><h3>Phone</h3><p>+1 (555) 792-8000</p></div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+          <div class="contact-detail-text"><h3>General Inquiries</h3><p>concierge@luxecut.com</p></div>
+        </div>
+      </div>
+      <div class="contact-map-card">
+        <div class="simulated-map" onclick="interactMap()" style="cursor:pointer">
+          <div class="map-grid-overlay"></div>
+          <div class="map-pin"><i class="fa-solid fa-location-dot"></i><div class="map-pin-pulse"></div></div>
+          <div class="map-card-popup"><h4>LUXECUT Salon</h4><p id="map-popup-text">Open Today: 9:00 AM - 8:00 PM</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a href="#" class="logo">LUXE<span>CUT</span></a>
+        <p>Offering premium cuts, beard trims, and upscale grooming services for the modern gentleman who values elegance and detail.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Yelp"><i class="fa-brands fa-yelp"></i></a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#services">Services Menu</a></li>
+          <li><a href="#barbers">Our Stylists</a></li>
+          <li><a href="#booking">Appointment Booking</a></li>
+          <li><a href="#location">Hours &amp; Map</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Hours of Operation</h4>
+        <ul class="footer-hours-list">
+          <li><span class="day">Mon – Fri:</span><span>9:00 AM – 8:00 PM</span></li>
+          <li><span class="day">Saturday:</span><span>9:00 AM – 6:00 PM</span></li>
+          <li><span class="day">Sunday:</span><span>10:00 AM – 4:00 PM</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 LuxeCut Salon &amp; Barber Shop. All rights reserved.</p>
+      <p>Designed with Luxury &amp; Precision.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

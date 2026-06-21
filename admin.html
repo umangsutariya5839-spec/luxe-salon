@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeCut | Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #d4af37;
+            --primary-hover: #c5a02e;
+            --bg-main: #0b0b0d;
+            --bg-surface: #141418;
+            --bg-elevated: #1e1e24;
+            --text-main: #f4f4f6;
+            --text-muted: #8a8a93;
+            --border: rgba(212,175,55,0.15);
+            --border-hover: rgba(212,175,55,0.35);
+            --font-title: 'Playfair Display', serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --danger: #e05050;
+            --success: #50c878;
+            --sidebar-w: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-main); color: var(--text-main); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ── LOGIN SCREEN ── */
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg-main);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        #login-screen.hidden { display: none; }
+        .login-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+        .login-logo { font-family: var(--font-title); font-size: 2rem; color: var(--text-main); letter-spacing: 2px; text-align: center; margin-bottom: 6px; }
+        .login-logo span { color: var(--primary); }
+        .login-subtitle { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 36px; }
+        .login-field { margin-bottom: 18px; }
+        .login-field label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 1px; }
+        .login-field input {
+            width: 100%; background: var(--bg-elevated); border: 1px solid var(--border);
+            color: var(--text-main); padding: 12px 16px; border-radius: 8px;
+            font-family: var(--font-body); font-size: 0.95rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        .login-field input:focus { border-color: var(--primary); }
+        .login-btn {
+            width: 100%; padding: 13px; background: var(--primary); border: none;
+            color: #000; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+            border-radius: 8px; cursor: pointer; transition: background 0.2s; margin-top: 8px;
+        }
+        .login-btn:hover { background: var(--primary-hover); }
+        .login-error { color: var(--danger); font-size: 0.82rem; margin-top: 10px; text-align: center; display: none; }
+
+        /* ── ADMIN LAYOUT ── */
+        #admin-app { display: none; min-height: 100vh; }
+        #admin-app.visible { display: flex; }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-w); background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0; height: 100vh;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            padding: 28px 24px 20px;
+            font-family: var(--font-title); font-size: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-logo span { color: var(--primary); }
+        .sidebar-badge {
+            display: block; font-size: 0.65rem; color: var(--primary);
+            background: rgba(212,175,55,0.1); border: 1px solid var(--border);
+            padding: 2px 8px; border-radius: 20px; margin-top: 6px;
+            width: fit-content; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .nav-section { padding: 20px 12px 8px; }
+        .nav-section-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; padding: 0 12px; margin-bottom: 6px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 8px; cursor: pointer;
+            font-size: 0.9rem; color: var(--text-muted);
+            transition: all 0.2s; border: none; background: none;
+            width: 100%; text-align: left;
+        }
+        .nav-item i { width: 18px; text-align: center; font-size: 0.95rem; }
+        .nav-item:hover { background: var(--bg-elevated); color: var(--text-main); }
+        .nav-item.active { background: rgba(212,175,55,0.12); color: var(--primary); border: 1px solid var(--border); }
+        .nav-item .nav-count {
+            margin-left: auto; background: var(--primary); color: #000;
+            font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+        }
+        .sidebar-bottom {
+            margin-top: auto; padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+        .sidebar-visit-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px;
+            background: rgba(212,175,55,0.08); border: 1px solid var(--border);
+            color: var(--primary); font-size: 0.85rem; cursor: pointer;
+            text-decoration: none; transition: background 0.2s; width: 100%;
+        }
+        .sidebar-visit-btn:hover { background: rgba(212,175,55,0.16); }
+        .logout-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px; width: 100%;
+            background: none; border: none; color: var(--text-muted);
+            font-size: 0.85rem; cursor: pointer; margin-top: 6px;
+            transition: color 0.2s;
+        }
+        .logout-btn:hover { color: var(--danger); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-w); flex: 1; padding: 32px; }
+
+        /* Top bar */
+        .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .topbar-title { font-family: var(--font-title); font-size: 1.6rem; }
+        .topbar-title span { color: var(--primary); }
+        .topbar-actions { display: flex; gap: 10px; }
+
+        /* Panels */
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* Stats row */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px;
+        }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-family: var(--font-title); font-size: 2rem; color: var(--primary); margin: 6px 0 2px; }
+        .stat-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+        /* Cards grid */
+        .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden;
+        }
+        .card-header {
+            padding: 18px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .card-title { font-family: var(--font-title); font-size: 1.05rem; }
+        .card-body { padding: 20px; }
+
+        /* Form styles */
+        .form-row { display: grid; gap: 14px; margin-bottom: 14px; }
+        .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+        .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; background: var(--bg-elevated); border: 1px solid var(--border);
+            color: var(--text-main); padding: 10px 14px; border-radius: 8px;
+            font-family: var(--font-body); font-size: 0.9rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group select option { background: var(--bg-elevated); }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer;
+            font-family: var(--font-body); font-size: 0.88rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: #000; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-danger { background: rgba(224,80,80,0.12); border: 1px solid rgba(224,80,80,0.3); color: var(--danger); }
+        .btn-danger:hover { background: rgba(224,80,80,0.22); }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-full { width: 100%; justify-content: center; }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th {
+            text-align: left; font-size: 0.72rem; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1px; padding: 10px 12px;
+            border-bottom: 1px solid var(--border); font-weight: 500;
+        }
+        .data-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.88rem; vertical-align: middle; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* Tags */
+        .tag {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .tag-hair { background: rgba(99,179,237,0.12); color: #63b3ed; border: 1px solid rgba(99,179,237,0.2); }
+        .tag-beard { background: rgba(154,117,72,0.15); color: #c9963a; border: 1px solid rgba(154,117,72,0.2); }
+        .tag-spa { background: rgba(104,211,145,0.1); color: #68d391; border: 1px solid rgba(104,211,145,0.2); }
+        .tag-available { background: rgba(80,200,120,0.12); color: var(--success); border: 1px solid rgba(80,200,120,0.2); }
+        .tag-booked { background: rgba(224,80,80,0.1); color: var(--danger); border: 1px solid rgba(224,80,80,0.2); }
+
+        /* Status badge for bookings */
+        .booking-status {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 600;
+            background: rgba(212,175,55,0.1); color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            color: var(--text-main); padding: 14px 20px; border-radius: 10px;
+            font-size: 0.88rem; z-index: 9999;
+            transform: translateY(80px); opacity: 0;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 10px;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        #toast.success { border-color: rgba(80,200,120,0.4); }
+        #toast.error { border-color: rgba(224,80,80,0.4); }
+        #toast i { font-size: 1rem; }
+        #toast.success i { color: var(--success); }
+        #toast.error i { color: var(--danger); }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 2.5rem; opacity: 0.3; margin-bottom: 12px; display: block; }
+        .empty-state p { font-size: 0.9rem; }
+
+        /* Divider */
+        .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+        /* Recent bookings on overview */
+        .booking-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.87rem;
+        }
+        .booking-row:last-child { border-bottom: none; }
+        .booking-id { color: var(--primary); font-weight: 600; font-size: 0.8rem; }
+        .booking-client { color: var(--text-main); }
+        .booking-meta { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* Confirm dialog overlay */
+        #confirm-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9998; display: none;
+        }
+        #confirm-overlay.show { display: flex; }
+        .confirm-box {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px; max-width: 380px; width: 90%;
+            text-align: center;
+        }
+        .confirm-box h3 { font-family: var(--font-title); margin-bottom: 10px; }
+        .confirm-box p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 24px; }
+        .confirm-actions { display: flex; gap: 12px; justify-content: center; }
+
+        @media (max-width: 900px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .section-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">LUXE<span>CUT</span></div>
+        <div class="login-subtitle">Admin Portal — Authorized Access Only</div>
+
+        <div class="login-field">
+            <label>Username</label>
+            <input type="text" id="login-user" placeholder="admin" autocomplete="off">
+        </div>
+        <div class="login-field">
+            <label>Password</label>
+            <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+        </div>
+        <button class="login-btn" onclick="doLogin()"><i class="fa-solid fa-lock-open"></i> &nbsp;Sign In</button>
+        <div class="login-error" id="login-error"><i class="fa-solid fa-triangle-exclamation"></i> Invalid credentials. Try again.</div>
+    </div>
+</div>
+
+<!-- ══ ADMIN APP ══ -->
+<div id="admin-app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            LUXE<span>CUT</span>
+            <span class="sidebar-badge"><i class="fa-solid fa-shield-halved"></i> &nbsp;Admin Panel</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-label">Overview</div>
+            <button class="nav-item active" onclick="switchPanel('overview', this)">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </button>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-label">Manage</div>
+            <button class="nav-item" onclick="switchPanel('bookings', this)">
+                <i class="fa-solid fa-calendar-check"></i> Bookings
+                <span class="nav-count" id="nav-count-bookings">0</span>
+            </button>
+            <button class="nav-item" onclick="switchPanel('services', this)">
+                <i class="fa-solid fa-scissors"></i> Services
+                <span class="nav-count" id="nav-count-services">0</span>
+            </button>
+            <button class="nav-item" onclick="switchPanel('barbers', this)">
+                <i class="fa-solid fa-user-tie"></i> Barbers / Stylists
+                <span class="nav-count" id="nav-count-barbers">0</span>
+            </button>
+        </div>
+
+        <div class="sidebar-bottom">
+            <a href="index.html" target="_blank" class="sidebar-visit-btn">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Main Website
+            </a>
+            <button class="logout-btn" onclick="doLogout()">
+                <i class="fa-solid fa-right-from-bracket"></i> Log Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+        <!-- ── OVERVIEW PANEL ── -->
+        <div class="panel active" id="panel-overview">
+            <div class="topbar">
+                <div class="topbar-title">Dashboard <span>Overview</span></div>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline btn-sm" onclick="refreshAll()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">Total Bookings</div>
+                    <div class="stat-value" id="stat-bookings">0</div>
+                    <div class="stat-sub">All time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Services Listed</div>
+                    <div class="stat-value" id="stat-services">0</div>
+                    <div class="stat-sub">Active on site</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Barbers / Stylists</div>
+                    <div class="stat-value" id="stat-barbers">0</div>
+                    <div class="stat-sub">On roster</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Revenue (est.)</div>
+                    <div class="stat-value" id="stat-revenue">$0</div>
+                    <div class="stat-sub">From bookings</div>
+                </div>
+            </div>
+
+            <div class="section-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Bookings</span>
+                        <button class="btn btn-outline btn-sm" onclick="switchPanel('bookings', document.querySelector('[onclick*=bookings]'))">View All</button>
+                    </div>
+                    <div class="card-body" id="overview-bookings-list">
+                        <div class="empty-state"><i class="fa-regular fa-calendar"></i><p>No bookings yet</p></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Top Barbers by Haircuts</span>
+                    </div>
+                    <div class="card-body" id="overview-barbers-list">
+                        <div class="empty-state"><i class="fa-solid fa-user-tie"></i><p>No barbers added</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── BOOKINGS PANEL ── -->
+        <div class="panel" id="panel-bookings">
+            <div class="topbar">
+                <div class="topbar-title">All <span>Bookings</span></div>
+                <button class="btn btn-outline btn-sm" onclick="loadBookings()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+            </div>
+            <div class="card">
+                <div class="card-body" style="padding:0; overflow-x: auto;">
+                    <table class="data-table" id="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Client</th>
+                                <th>Barber</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Services</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-tbody">
+                            <tr><td colspan="8"><div class="empty-state"><i class="fa-regular fa-calendar"></i><p>No bookings yet. They appear here after customers book from the main site.</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SERVICES PANEL ── -->
+        <div class="panel" id="panel-services">
+            <div class="topbar">
+                <div class="topbar-title">Manage <span>Services</span></div>
+            </div>
+            <div class="section-grid">
+                <!-- Add Service Form -->
+                <div class="card">
+                    <div class="card-header"><span class="card-title"><i class="fa-solid fa-plus" style="color:var(--primary)"></i> &nbsp;Add New Service</span></div>
+                    <div class="card-body">
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label>Service Name *</label>
+                                <input type="text" id="svc-name" placeholder="e.g. Classic Haircut">
+                            </div>
+                            <div class="form-group">
+                                <label>Category *</label>
+                                <select id="svc-category">
+                                    <option value="hair">Haircuts & Styling</option>
+                                    <option value="beard">Beard & Shave</option>
+                                    <option value="spa">Spa & Grooming</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label>Price (USD) *</label>
+                                <input type="number" id="svc-price" placeholder="45" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Duration *</label>
+                                <input type="text" id="svc-duration" placeholder="45 mins">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="svc-desc" placeholder="Brief description of the service..."></textarea>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="addService()">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Service
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Services List -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Current Services</span>
+                        <button class="btn btn-outline btn-sm" onclick="loadServices()"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                    <div class="card-body" style="padding:0; max-height: 520px; overflow-y: auto;">
+                        <table class="data-table" id="services-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="services-tbody">
+                                <tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-scissors"></i><p>No services yet</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── BARBERS PANEL ── -->
+        <div class="panel" id="panel-barbers">
+            <div class="topbar">
+                <div class="topbar-title">Manage <span>Barbers & Stylists</span></div>
+            </div>
+            <div class="section-grid">
+                <!-- Add Barber Form -->
+                <div class="card">
+                    <div class="card-header"><span class="card-title"><i class="fa-solid fa-plus" style="color:var(--primary)"></i> &nbsp;Add New Barber</span></div>
+                    <div class="card-body">
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="brb-name" placeholder="e.g. Marcus Reid">
+                            </div>
+                            <div class="form-group">
+                                <label>Specialty *</label>
+                                <input type="text" id="brb-specialty" placeholder="e.g. Master Barber">
+                            </div>
+                        </div>
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label>Rating (0–5)</label>
+                                <input type="number" id="brb-rating" placeholder="4.9" min="0" max="5" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Review Count</label>
+                                <input type="number" id="brb-reviews" placeholder="120" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Profile Image URL</label>
+                                <input type="text" id="brb-image" placeholder="https://...jpg or leave blank for placeholder">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Availability</label>
+                                <select id="brb-available">
+                                    <option value="true">Available</option>
+                                    <option value="false">Booked / Unavailable</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="addBarber()">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Barber
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barbers List -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Current Barbers</span>
+                        <button class="btn btn-outline btn-sm" onclick="loadBarbers()"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                    <div class="card-body" style="padding:0; max-height: 520px; overflow-y: auto;">
+                        <table class="data-table" id="barbers-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Specialty</th>
+                                    <th>Rating</th>
+                                    <th>Haircuts</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="barbers-tbody">
+                                <tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-user-tie"></i><p>No barbers yet</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Toast -->
+<div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg">Done</span></div>
+
+<!-- Confirm Dialog -->
+<div id="confirm-overlay">
+    <div class="confirm-box">
+        <h3>Confirm Delete</h3>
+        <p id="confirm-msg">Are you sure you want to delete this item? This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-danger" id="confirm-ok-btn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CREDENTIALS (change to your own!)
+// ══════════════════════════════════════════
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'luxecut2024';
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let allBookings = [];
+let allServices = [];
+let allBarbers  = [];
+let confirmCallback = null;
+
+// ══════════════════════════════════════════
+//  LOGIN / LOGOUT
+// ══════════════════════════════════════════
+function doLogin() {
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pass').value;
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+        sessionStorage.setItem('lxc-admin', '1');
+        document.getElementById('login-screen').classList.add('hidden');
+        const app = document.getElementById('admin-app');
+        app.classList.add('visible');
+        refreshAll();
+    } else {
+        const err = document.getElementById('login-error');
+        err.style.display = 'block';
+        setTimeout(() => err.style.display = 'none', 3000);
+    }
+}
+
+function doLogout() {
+    sessionStorage.removeItem('lxc-admin');
+    document.getElementById('admin-app').classList.remove('visible');
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('login-pass').value = '';
+}
+
+// Auto-login if session exists
+window.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('lxc-admin') === '1') {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('admin-app').classList.add('visible');
+        refreshAll();
+    }
+});
+
+// ══════════════════════════════════════════
+//  PANEL NAVIGATION
+// ══════════════════════════════════════════
+function switchPanel(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    // Lazy load on switch
+    if (name === 'bookings') loadBookings();
+    if (name === 'services') loadServices();
+    if (name === 'barbers')  loadBarbers();
+}
+
+// ══════════════════════════════════════════
+//  DATA LOADING
+// ══════════════════════════════════════════
+async function refreshAll() {
+    await Promise.all([loadBookings(), loadServices(), loadBarbers()]);
+    renderOverview();
+}
+
+async function loadBookings() {
+    try {
+        const res = await fetch('/api/bookings');
+        allBookings = res.ok ? await res.json() : [];
+    } catch { allBookings = []; }
+    updateCounts();
+    renderBookingsTable();
+}
+
+async function loadServices() {
+    try {
+        const res = await fetch('/api/services');
+        allServices = res.ok ? await res.json() : [];
+    } catch { allServices = []; }
+    updateCounts();
+    renderServicesTable();
+}
+
+async function loadBarbers() {
+    try {
+        const res = await fetch('/api/barbers');
+        allBarbers = res.ok ? await res.json() : [];
+    } catch { allBarbers = []; }
+    updateCounts();
+    renderBarbersTable();
+}
+
+function updateCounts() {
+    document.getElementById('nav-count-bookings').textContent = allBookings.length;
+    document.getElementById('nav-count-services').textContent = allServices.length;
+    document.getElementById('nav-count-barbers').textContent  = allBarbers.length;
+}
+
+// ══════════════════════════════════════════
+//  OVERVIEW RENDER
+// ══════════════════════════════════════════
+function renderOverview() {
+    document.getElementById('stat-bookings').textContent = allBookings.length;
+    document.getElementById('stat-services').textContent = allServices.length;
+    document.getElementById('stat-barbers').textContent  = allBarbers.length;
+
+    // Estimate revenue from bookings
+    let revenue = 0;
+    allBookings.forEach(b => {
+        (b.services || []).forEach(sid => {
+            const svc = allServices.find(s => s.id === sid);
+            if (svc) revenue += parseFloat(svc.price || 0);
+        });
+    });
+    document.getElementById('stat-revenue').textContent = '$' + revenue.toFixed(0);
+
+    // Recent bookings list
+    const bList = document.getElementById('overview-bookings-list');
+    if (!allBookings.length) {
+        bList.innerHTML = '<div class="empty-state"><i class="fa-regular fa-calendar"></i><p>No bookings yet</p></div>';
+    } else {
+        const recent = [...allBookings].reverse().slice(0, 5);
+        bList.innerHTML = recent.map(b => {
+            const barber = allBarbers.find(br => br.id === b.barberId);
+            const dateStr = b.date ? new Date(b.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : '—';
+            return `<div class="booking-row">
+                <div>
+                    <div class="booking-id">${b.bookingId}</div>
+                    <div class="booking-client">${b.clientDetails?.name || 'Unknown'}</div>
+                </div>
+                <div style="text-align:right">
+                    <div class="booking-meta">${barber ? barber.name : 'N/A'}</div>
+                    <div class="booking-meta">${dateStr} · ${b.time || ''}</div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // Top barbers
+    const brList = document.getElementById('overview-barbers-list');
+    if (!allBarbers.length) {
+        brList.innerHTML = '<div class="empty-state"><i class="fa-solid fa-user-tie"></i><p>No barbers added</p></div>';
+    } else {
+        const sorted = [...allBarbers].sort((a,b) => (b.haircutCount||0)-(a.haircutCount||0));
+        brList.innerHTML = sorted.map((b, i) => `
+            <div class="booking-row">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <span style="color:var(--primary);font-weight:700;font-size:1.1rem;width:20px">#${i+1}</span>
+                    <div>
+                        <div style="font-weight:500">${b.name}</div>
+                        <div style="color:var(--text-muted);font-size:0.78rem">${b.specialty}</div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <div style="color:var(--primary);font-weight:600">${b.haircutCount || 0} <span style="color:var(--text-muted);font-weight:400;font-size:0.78rem">haircuts</span></div>
+                    <div style="color:var(--text-muted);font-size:0.78rem">⭐ ${b.rating || '—'}</div>
+                </div>
+            </div>`).join('');
+    }
+}
+
+// ══════════════════════════════════════════
+//  BOOKINGS TABLE
+// ══════════════════════════════════════════
+function renderBookingsTable() {
+    const tbody = document.getElementById('bookings-tbody');
+    if (!allBookings.length) {
+        tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fa-regular fa-calendar"></i><p>No bookings yet. They appear here after customers book from the main site.</p></div></td></tr>';
+        return;
+    }
+    const sorted = [...allBookings].reverse();
+    tbody.innerHTML = sorted.map(b => {
+        const barber = allBarbers.find(br => br.id === b.barberId);
+        const dateStr = b.date ? new Date(b.date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '—';
+        const svcNames = (b.services || []).map(sid => {
+            const s = allServices.find(sv => sv.id === sid);
+            return s ? s.name : sid;
+        }).join(', ');
+        return `<tr>
+            <td><span style="color:var(--primary);font-weight:600;font-size:0.82rem">${b.bookingId}</span></td>
+            <td>
+                <div>${b.clientDetails?.name || '—'}</div>
+                <div style="color:var(--text-muted);font-size:0.78rem">${b.clientDetails?.email || ''}</div>
+            </td>
+            <td>${barber ? barber.name : (b.barberId || '—')}</td>
+            <td>${dateStr}</td>
+            <td>${b.time || '—'}</td>
+            <td style="max-width:180px;font-size:0.82rem">${svcNames || '—'}</td>
+            <td style="text-transform:capitalize">${b.paymentMethod || '—'}</td>
+            <td><span class="booking-status">Confirmed</span></td>
+        </tr>`;
+    }).join('');
+}
+
+// ══════════════════════════════════════════
+//  SERVICES CRUD
+// ══════════════════════════════════════════
+async function addService() {
+    const name     = document.getElementById('svc-name').value.trim();
+    const category = document.getElementById('svc-category').value;
+    const price    = parseFloat(document.getElementById('svc-price').value);
+    const duration = document.getElementById('svc-duration').value.trim();
+    const desc     = document.getElementById('svc-desc').value.trim();
+
+    if (!name || !category || isNaN(price) || !duration) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
+    }
+
+    const service = {
+        id: 'svc-' + Date.now(),
+        name, category, price, duration,
+        desc: desc || 'Premium salon service.'
+    };
+
+    try {
+        const res = await fetch('/api/services', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(service)
+        });
+        if (!res.ok) throw new Error();
+        showToast('Service added successfully!', 'success');
+        clearServiceForm();
+        await loadServices();
+        renderOverview();
+    } catch {
+        showToast('Failed to save service. Is the server running?', 'error');
+    }
+}
+
+function clearServiceForm() {
+    ['svc-name','svc-price','svc-duration','svc-desc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('svc-category').value = 'hair';
+}
+
+function renderServicesTable() {
+    const tbody = document.getElementById('services-tbody');
+    if (!allServices.length) {
+        tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-scissors"></i><p>No services yet. Add one on the left.</p></div></td></tr>';
+        return;
+    }
+    const catMap = { hair: 'tag-hair', beard: 'tag-beard', spa: 'tag-spa' };
+    const catLabel = { hair: 'Hair', beard: 'Beard', spa: 'Spa' };
+    tbody.innerHTML = allServices.map(s => `
+        <tr>
+            <td><strong>${s.name}</strong><br><span style="color:var(--text-muted);font-size:0.78rem">${s.desc ? s.desc.substring(0,50)+'…' : ''}</span></td>
+            <td><span class="tag ${catMap[s.category]||'tag-hair'}">${catLabel[s.category]||s.category}</span></td>
+            <td>$${s.price}</td>
+            <td>${s.duration}</td>
+            <td>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('service','${s.id}','${escHtml(s.name)}')">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        </tr>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  BARBERS CRUD
+// ══════════════════════════════════════════
+async function addBarber() {
+    const name      = document.getElementById('brb-name').value.trim();
+    const specialty = document.getElementById('brb-specialty').value.trim();
+    const rating    = parseFloat(document.getElementById('brb-rating').value) || 5.0;
+    const reviews   = parseInt(document.getElementById('brb-reviews').value) || 0;
+    const image     = document.getElementById('brb-image').value.trim() || generateAvatar(name);
+    const available = document.getElementById('brb-available').value === 'true';
+
+    if (!name || !specialty) {
+        showToast('Name and specialty are required.', 'error');
+        return;
+    }
+
+    const barber = {
+        id: 'brb-' + Date.now(),
+        name, specialty, rating, reviews, image, available,
+        haircutCount: 0
+    };
+
+    try {
+        const res = await fetch('/api/barbers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(barber)
+        });
+        if (!res.ok) throw new Error();
+        showToast('Barber added successfully!', 'success');
+        clearBarberForm();
+        await loadBarbers();
+        renderOverview();
+    } catch {
+        showToast('Failed to save barber. Is the server running?', 'error');
+    }
+}
+
+function clearBarberForm() {
+    ['brb-name','brb-specialty','brb-rating','brb-reviews','brb-image'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('brb-available').value = 'true';
+}
+
+function renderBarbersTable() {
+    const tbody = document.getElementById('barbers-tbody');
+    if (!allBarbers.length) {
+        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-user-tie"></i><p>No barbers yet. Add one on the left.</p></div></td></tr>';
+        return;
+    }
+    tbody.innerHTML = allBarbers.map(b => `
+        <tr>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <img src="${b.image}" onerror="this.src='${generateAvatar(b.name)}'" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid var(--border)">
+                    <strong>${b.name}</strong>
+                </div>
+            </td>
+            <td style="color:var(--text-muted)">${b.specialty}</td>
+            <td>⭐ ${b.rating}</td>
+            <td>${b.haircutCount || 0}</td>
+            <td><span class="tag ${b.available ? 'tag-available' : 'tag-booked'}">${b.available ? 'Available' : 'Booked'}</span></td>
+            <td>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('barber','${b.id}','${escHtml(b.name)}')">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        </tr>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  DELETE (with confirmation dialog)
+// ══════════════════════════════════════════
+function confirmDelete(type, id, name) {
+    document.getElementById('confirm-msg').textContent = `Delete "${name}"? This cannot be undone.`;
+    document.getElementById('confirm-overlay').classList.add('show');
+    confirmCallback = () => doDelete(type, id);
+}
+
+function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+    confirmCallback = null;
+}
+
+document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+});
+
+async function doDelete(type, id) {
+    try {
+        const res = await fetch(`/api/${type}s/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+        showToast(`${type === 'service' ? 'Service' : 'Barber'} deleted.`, 'success');
+        if (type === 'service') await loadServices();
+        else await loadBarbers();
+        renderOverview();
+    } catch {
+        showToast('Delete failed. Make sure server supports DELETE, or refresh.', 'error');
+        // Optimistic local remove fallback
+        if (type === 'service') {
+            allServices = allServices.filter(s => s.id !== id);
+            renderServicesTable();
+        } else {
+            allBarbers = allBarbers.filter(b => b.id !== id);
+            renderBarbersTable();
+        }
+        renderOverview();
+        updateCounts();
+    }
+}
+
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.className = `show ${type}`;
+    toast.querySelector('i').className = type === 'success'
+        ? 'fa-solid fa-circle-check'
+        : 'fa-solid fa-circle-exclamation';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.className = '', 3200);
+}
+
+function generateAvatar(name) {
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=1e1e24&color=d4af37&size=80&bold=true`;
+}
+
+function escHtml(s) {
+    return (s||'').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>
